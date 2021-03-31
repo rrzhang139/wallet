@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { render } from 'react-dom'
+import bsc from '@binance-chain/bsc-use-wallet'
+import { UseWalletProvider, useWallet } from 'use-wallet'
 
 function App() {
+  const wallet = useWallet()
+  const blockNumber = wallet.getBlockNumber()
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <h1>Wallet</h1>
+      {wallet.status === 'connected' ? (
+        <div>
+          <div>Account: {wallet.account}</div>
+          <div>Balance: {wallet.balance}</div>
+          <button onClick={() => wallet.reset()}>disconnect</button>
+        </div>
+      ) : (
+          <div>
+            Connect:
+            <button onClick={() => wallet.connect()}>MetaMask</button>
+            <button onClick={() => wallet.connect('frame')}>Frame</button>
+            <button onClick={() => wallet.connect('portis')}>Portis</button>
+          </div>
+        )}
+    </>
+  )
 }
 
-export default App;
+// Wrap everything in <UseWalletProvider />
+export default () => (
+  (
+    <UseWalletProvider connectors={{ bsc }}>
+      <App />
+    </UseWalletProvider>
+  ),
+  document.getElementById('root')
+)
